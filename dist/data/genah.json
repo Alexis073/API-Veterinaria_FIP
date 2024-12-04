@@ -1,0 +1,15 @@
+{
+  "id": "v_663",
+  "nombre": "genah",
+  "clientes": [
+    {
+      "id": "c_6639",
+      "nombre": "genaaaah",
+      "telefono": "123",
+      "esVIP": true,
+      "visitas": 55415
+    }
+  ],
+  "pacientes": [],
+  "proveedores": []
+}

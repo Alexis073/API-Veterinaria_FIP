@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const readline_1 = __importDefault(require("readline"));
 const veterinariaServicios_1 = require("./veterinariaServicios");
+const clientesServicios_1 = require("./clientesServicios");
 const rl = readline_1.default.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -12,19 +13,97 @@ const rl = readline_1.default.createInterface({
 const mostrarMenu = () => {
     console.log("\n--- Menú Veterinaria ---");
     console.log("1. Crear nueva veterinaria");
-    console.log("2. Salir");
-    rl.question("Seleccione una opcion: ", (op) => {
+    console.log("2. Administrar clientes");
+    console.log("3. Salir");
+    rl.question("Seleccione una opción: ", (op) => {
         switch (op) {
             case "1":
                 crearNuevaVeterinaria();
                 break;
             case "2":
+                rl.question("Ingrese el nombre de la veterinaria: ", (veterinariaNombre) => {
+                    mostrarMenuClientes(veterinariaNombre);
+                });
+                break;
+            case "3":
                 console.log("Programa cerrado.");
                 rl.close();
                 break;
             default:
-                console.log("Opción no valida.");
+                console.log("Opción no válida.");
                 mostrarMenu();
+        }
+    });
+};
+const mostrarMenuClientes = (veterinariaNombre) => {
+    console.log("\n--- Menú Clientes ---");
+    console.log("1. Crear cliente");
+    console.log("2. Modificar cliente");
+    console.log("3. Eliminar cliente");
+    console.log("4. Listar clientes");
+    console.log("5. Volver al menú principal");
+    rl.question("Seleccione una opción: ", (op) => {
+        switch (op) {
+            case "1":
+                rl.question("Nombre del cliente: ", (nombre) => {
+                    rl.question("Teléfono del cliente: ", (telefono) => {
+                        try {
+                            (0, clientesServicios_1.crearCliente)(veterinariaNombre, nombre, telefono);
+                            console.log("Cliente creado correctamente.");
+                        }
+                        catch (error) {
+                            manejarError(error);
+                        }
+                        mostrarMenuClientes(veterinariaNombre);
+                    });
+                });
+                break;
+            case "2":
+                rl.question("ID del cliente: ", (id) => {
+                    rl.question("Nuevo nombre (dejar vacío para no cambiar): ", (nombre) => {
+                        rl.question("Nuevo teléfono (dejar vacío para no cambiar): ", (telefono) => {
+                            try {
+                                (0, clientesServicios_1.modificarCliente)(veterinariaNombre, id, {
+                                    nombre: nombre || undefined,
+                                    telefono: telefono || undefined,
+                                });
+                                console.log("Cliente modificado correctamente.");
+                            }
+                            catch (error) {
+                                manejarError(error);
+                            }
+                            mostrarMenuClientes(veterinariaNombre);
+                        });
+                    });
+                });
+                break;
+            case "3":
+                rl.question("ID del cliente: ", (id) => {
+                    try {
+                        (0, clientesServicios_1.eliminarCliente)(veterinariaNombre, id);
+                        console.log("Cliente eliminado correctamente.");
+                    }
+                    catch (error) {
+                        manejarError(error);
+                    }
+                    mostrarMenuClientes(veterinariaNombre);
+                });
+                break;
+            case "4":
+                try {
+                    (0, clientesServicios_1.listarClientes)(veterinariaNombre);
+                }
+                catch (error) {
+                    manejarError(error);
+                }
+                mostrarMenuClientes(veterinariaNombre);
+                break;
+            case "5":
+                mostrarMenu();
+                break;
+            default:
+                console.log("Opción no valida.");
+                mostrarMenuClientes(veterinariaNombre);
         }
     });
 };
@@ -32,13 +111,21 @@ const crearNuevaVeterinaria = () => {
     rl.question("Ingresar el nombre de la veterinaria: ", (nombre) => {
         (0, veterinariaServicios_1.crearVeterinaria)(nombre)
             .then(() => {
-            console.log("Veteriniaria creada correctamente.");
+            console.log("Veterinaria creada correctamente.");
             mostrarMenu();
         })
             .catch((err) => {
-            console.error("Error al crear la veterinaria: ", err);
+            manejarError(err);
             mostrarMenu();
         });
     });
+};
+const manejarError = (error) => {
+    if (error instanceof Error) {
+        console.error("Error: ", error.message);
+    }
+    else {
+        console.error("Error desconocido: ", error);
+    }
 };
 mostrarMenu();
