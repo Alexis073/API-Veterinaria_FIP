@@ -8,6 +8,7 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const readline_sync_1 = __importDefault(require("readline-sync"));
 const basePath = path_1.default.join(__dirname, "data");
+const generarIdUnico_1 = require("./generarIdUnico");
 const cargarDatosVeterinaria = (veterinariaNombre) => {
     const filePath = path_1.default.join(basePath, `${veterinariaNombre.replace(/\s+/g, "-").toLowerCase()}.json`);
     if (!fs_1.default.existsSync(filePath)) {
@@ -15,7 +16,7 @@ const cargarDatosVeterinaria = (veterinariaNombre) => {
     }
     const data = fs_1.default.readFileSync(filePath, "utf-8");
     try {
-        const parsedData = JSON.parse(data); // Intentar parsear el JSON
+        const parsedData = JSON.parse(data);
         return parsedData;
     }
     catch (error) {
@@ -27,17 +28,10 @@ const guardarDatosVeterinaria = (veterinariaNombre, datos) => {
     const filePath = path_1.default.join(basePath, `${veterinariaNombre.replace(/\s+/g, "-").toLowerCase()}.json`);
     fs_1.default.writeFileSync(filePath, JSON.stringify(datos, null, 2), "utf8");
 };
-const generarIdUnico = (lista) => {
-    let nuevoId;
-    do {
-        nuevoId = `c_${Math.floor(Math.random() * 10000)}`;
-    } while (lista.some((item) => item.id === nuevoId));
-    return nuevoId;
-};
 const crearCliente = (veterinariaNombre, nombre, telefono) => {
     const datos = cargarDatosVeterinaria(veterinariaNombre);
     const nuevoCliente = {
-        id: generarIdUnico(datos.clientes),
+        id: (0, generarIdUnico_1.generarIdUnico)(datos.clientes),
         nombre,
         telefono,
         esVIP: false,
@@ -57,18 +51,14 @@ const modificarCliente = (veterinariaNombre, clienteId, nuevosDatos) => {
     if (!cliente) {
         throw new Error("Cliente no encontrado.");
     }
-    // Modificar nombre y teléfono si se pasan nuevos datos
     if (nuevosDatos.nombre)
         cliente.nombre = nuevosDatos.nombre;
     if (nuevosDatos.telefono)
         cliente.telefono = nuevosDatos.telefono;
-    // Solicitar el nuevo número de visitas
-    const nuevoNumeroVisitas = readline_sync_1.default.questionInt('Nuevo número de visitas (dejar vacío para no cambiar): ', {
-        defaultInput: cliente.visitas.toString(), // Si no se ingresa, se mantiene el valor actual
+    const nuevoNumeroVisitas = readline_sync_1.default.questionInt("Nuevo número de visitas (dejar vacío para no cambiar): ", {
+        defaultInput: cliente.visitas.toString(),
     });
-    // Actualizar visitas
     cliente.visitas = nuevoNumeroVisitas;
-    // Revisar si el cliente se vuelve VIP (más de 5 visitas)
     cliente.esVIP = cliente.visitas >= 5;
     guardarDatosVeterinaria(veterinariaNombre, datos);
     console.log("Cliente modificado correctamente:", cliente);

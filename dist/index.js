@@ -13,19 +13,41 @@ const rl = readline_1.default.createInterface({
 const mostrarMenu = () => {
     console.log("\n--- Menú Veterinaria ---");
     console.log("1. Crear nueva veterinaria");
-    console.log("2. Administrar clientes");
-    console.log("3. Salir");
+    console.log("2. Modificar veterinaria");
+    console.log("3. Eliminar veterinaria");
+    console.log("4. Administrar clientes");
+    console.log("5. Salir");
     rl.question("Seleccione una opción: ", (op) => {
         switch (op) {
             case "1":
                 crearNuevaVeterinaria();
                 break;
             case "2":
+                rl.question("Ingrese el nombre de la veterinaria a modificar: ", (nombre) => {
+                    rl.question("Nuevo nombre (dejar vacío para no cambiar): ", (nuevoNombre) => {
+                        (0, veterinariaServicios_1.modificarVeterinaria)(nombre, {
+                            nombre: nuevoNombre || undefined,
+                        })
+                            .then(() => console.log("Veterinaria modificada correctamente."))
+                            .catch((err) => manejarError(err))
+                            .finally(() => mostrarMenu());
+                    });
+                });
+                break;
+            case "3":
+                rl.question("Ingrese el nombre de la veterinaria a eliminar: ", (nombre) => {
+                    (0, veterinariaServicios_1.eliminarVeterinaria)(nombre)
+                        .then(() => console.log("Veterinaria eliminada correctamente."))
+                        .catch((err) => manejarError(err))
+                        .finally(() => mostrarMenu());
+                });
+                break;
+            case "4":
                 rl.question("Ingrese el nombre de la veterinaria: ", (veterinariaNombre) => {
                     mostrarMenuClientes(veterinariaNombre);
                 });
                 break;
-            case "3":
+            case "5":
                 console.log("Programa cerrado.");
                 rl.close();
                 break;

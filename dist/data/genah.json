@@ -1,6 +1,6 @@
 {
   "id": "v_663",
-  "nombre": "genah",
+  "nombre": "Genah",
   "clientes": [
     {
       "id": "c_6639",
@@ -8,6 +8,13 @@
       "telefono": "123",
       "esVIP": true,
       "visitas": 55415
+    },
+    {
+      "id": "c_8935",
+      "nombre": "Rolando Rosas",
+      "telefono": "111",
+      "esVIP": false,
+      "visitas": 0
     }
   ],
   "pacientes": [],

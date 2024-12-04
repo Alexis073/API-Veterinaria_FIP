@@ -1,10 +1,15 @@
 import fs from "fs";
 import path from "path";
-import readlineSync from 'readline-sync';
+import readlineSync from "readline-sync";
 const basePath = path.join(__dirname, "data");
 
+import { generarIdUnico } from "./generarIdUnico";
+
 const cargarDatosVeterinaria = (veterinariaNombre: string) => {
-  const filePath = path.join(basePath, `${veterinariaNombre.replace(/\s+/g, "-").toLowerCase()}.json`);
+  const filePath = path.join(
+    basePath,
+    `${veterinariaNombre.replace(/\s+/g, "-").toLowerCase()}.json`
+  );
   if (!fs.existsSync(filePath)) {
     throw new Error(`La veterinaria "${veterinariaNombre}" no existe.`);
   }
@@ -18,20 +23,13 @@ const cargarDatosVeterinaria = (veterinariaNombre: string) => {
     throw error;
   }
 };
+
 const guardarDatosVeterinaria = (veterinariaNombre: string, datos: any) => {
   const filePath = path.join(
     basePath,
     `${veterinariaNombre.replace(/\s+/g, "-").toLowerCase()}.json`
   );
   fs.writeFileSync(filePath, JSON.stringify(datos, null, 2), "utf8");
-};
-
-const generarIdUnico = (lista: any[]) => {
-  let nuevoId: string;
-  do {
-    nuevoId = `c_${Math.floor(Math.random() * 10000)}`;
-  } while (lista.some((item) => item.id === nuevoId));
-  return nuevoId;
 };
 
 export const crearCliente = (
@@ -73,14 +71,17 @@ export const modificarCliente = (
   if (nuevosDatos.nombre) cliente.nombre = nuevosDatos.nombre;
   if (nuevosDatos.telefono) cliente.telefono = nuevosDatos.telefono;
 
-  const nuevoNumeroVisitas = readlineSync.questionInt('Nuevo número de visitas (dejar vacío para no cambiar): ', {
-    defaultInput: cliente.visitas.toString(), 
-  });
+  const nuevoNumeroVisitas = readlineSync.questionInt(
+    "Nuevo número de visitas (dejar vacío para no cambiar): ",
+    {
+      defaultInput: cliente.visitas.toString(),
+    }
+  );
   cliente.visitas = nuevoNumeroVisitas;
   cliente.esVIP = cliente.visitas >= 5;
   guardarDatosVeterinaria(veterinariaNombre, datos);
   console.log("Cliente modificado correctamente:", cliente);
-}
+};
 
 export const eliminarCliente = (
   veterinariaNombre: string,

@@ -1,6 +1,8 @@
 import readline from "readline";
 import {
   crearVeterinaria,
+  modificarVeterinaria,
+  eliminarVeterinaria,
 } from "./veterinariaServicios";
 import {
   crearCliente,
@@ -17,19 +19,55 @@ const rl = readline.createInterface({
 const mostrarMenu = () => {
   console.log("\n--- Menú Veterinaria ---");
   console.log("1. Crear nueva veterinaria");
-  console.log("2. Administrar clientes");
-  console.log("3. Salir");
+  console.log("2. Modificar veterinaria");
+  console.log("3. Eliminar veterinaria");
+  console.log("4. Administrar clientes");
+  console.log("5. Salir");
   rl.question("Seleccione una opción: ", (op) => {
     switch (op) {
       case "1":
         crearNuevaVeterinaria();
         break;
       case "2":
-        rl.question("Ingrese el nombre de la veterinaria: ", (veterinariaNombre) => {
-          mostrarMenuClientes(veterinariaNombre);
-        });
+        rl.question(
+          "Ingrese el nombre de la veterinaria a modificar: ",
+          (nombre) => {
+            rl.question(
+              "Nuevo nombre (dejar vacío para no cambiar): ",
+              (nuevoNombre) => {
+                modificarVeterinaria(nombre, {
+                  nombre: nuevoNombre || undefined,
+                })
+                  .then(() =>
+                    console.log("Veterinaria modificada correctamente.")
+                  )
+                  .catch((err) => manejarError(err))
+                  .finally(() => mostrarMenu());
+              }
+            );
+          }
+        );
         break;
       case "3":
+        rl.question(
+          "Ingrese el nombre de la veterinaria a eliminar: ",
+          (nombre) => {
+            eliminarVeterinaria(nombre)
+              .then(() => console.log("Veterinaria eliminada correctamente."))
+              .catch((err) => manejarError(err))
+              .finally(() => mostrarMenu());
+          }
+        );
+        break;
+      case "4":
+        rl.question(
+          "Ingrese el nombre de la veterinaria: ",
+          (veterinariaNombre) => {
+            mostrarMenuClientes(veterinariaNombre);
+          }
+        );
+        break;
+      case "5":
         console.log("Programa cerrado.");
         rl.close();
         break;
@@ -65,20 +103,26 @@ const mostrarMenuClientes = (veterinariaNombre: string) => {
         break;
       case "2":
         rl.question("ID del cliente: ", (id) => {
-          rl.question("Nuevo nombre (dejar vacío para no cambiar): ", (nombre) => {
-            rl.question("Nuevo teléfono (dejar vacío para no cambiar): ", (telefono) => {
-              try {
-                modificarCliente(veterinariaNombre, id, {
-                  nombre: nombre || undefined,
-                  telefono: telefono || undefined,
-                });
-                console.log("Cliente modificado correctamente.");
-              } catch (error) {
-                manejarError(error);
-              }
-              mostrarMenuClientes(veterinariaNombre);
-            });
-          });
+          rl.question(
+            "Nuevo nombre (dejar vacío para no cambiar): ",
+            (nombre) => {
+              rl.question(
+                "Nuevo teléfono (dejar vacío para no cambiar): ",
+                (telefono) => {
+                  try {
+                    modificarCliente(veterinariaNombre, id, {
+                      nombre: nombre || undefined,
+                      telefono: telefono || undefined,
+                    });
+                    console.log("Cliente modificado correctamente.");
+                  } catch (error) {
+                    manejarError(error);
+                  }
+                  mostrarMenuClientes(veterinariaNombre);
+                }
+              );
+            }
+          );
         });
         break;
       case "3":
