@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.eliminarProveedor = exports.modificarProveedor = exports.listarProveedores = exports.crearProveedor = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
+const generarIdUnico_1 = require("./generarIdUnico");
 const basePath = path_1.default.join(__dirname, "data");
 const cargarDatosVeterinaria = (veterinariaNombre) => {
     const filePath = path_1.default.join(basePath, `${veterinariaNombre.replace(/\s+/g, "-").toLowerCase()}.json`);
@@ -18,16 +19,13 @@ const guardarDatosVeterinaria = (veterinariaNombre, datos) => {
     const filePath = path_1.default.join(basePath, `${veterinariaNombre.replace(/\s+/g, "-").toLowerCase()}.json`);
     fs_1.default.writeFileSync(filePath, JSON.stringify(datos, null, 2), "utf-8");
 };
-const generarIdUnico = (lista) => {
-    let nuevoId;
-    do {
-        nuevoId = `prov_${Math.floor(Math.random() * 10000)}`;
-    } while (lista.some((item) => item.id === nuevoId));
-    return nuevoId;
-};
 const crearProveedor = (veterinariaNombre, nombre, telefono) => {
     const datos = cargarDatosVeterinaria(veterinariaNombre);
-    const nuevoProveedor = { id: generarIdUnico(datos.proveedores), nombre, telefono };
+    const nuevoProveedor = {
+        id: (0, generarIdUnico_1.generarIdUnico)(datos.proveedores),
+        nombre,
+        telefono,
+    };
     datos.proveedores.push(nuevoProveedor);
     guardarDatosVeterinaria(veterinariaNombre, datos);
     console.log("Proveedor creado:", nuevoProveedor);

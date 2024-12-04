@@ -1,43 +1,19 @@
-import fs from "fs";
 import path from "path";
 import readlineSync from "readline-sync";
 const basePath = path.join(__dirname, "data");
 
 import { generarIdUnico } from "./generarIdUnico";
-
-const cargarDatosVeterinaria = (veterinariaNombre: string) => {
-  const filePath = path.join(
-    basePath,
-    `${veterinariaNombre.replace(/\s+/g, "-").toLowerCase()}.json`
-  );
-  if (!fs.existsSync(filePath)) {
-    throw new Error(`La veterinaria "${veterinariaNombre}" no existe.`);
-  }
-  const data = fs.readFileSync(filePath, "utf-8");
-
-  try {
-    const parsedData = JSON.parse(data);
-    return parsedData;
-  } catch (error) {
-    console.error("Error al analizar JSON:", error);
-    throw error;
-  }
-};
-
-const guardarDatosVeterinaria = (veterinariaNombre: string, datos: any) => {
-  const filePath = path.join(
-    basePath,
-    `${veterinariaNombre.replace(/\s+/g, "-").toLowerCase()}.json`
-  );
-  fs.writeFileSync(filePath, JSON.stringify(datos, null, 2), "utf8");
-};
+import {
+  cargarDatosVeterinaria,
+  guardarDatosVeterinaria,
+} from "./datosVeterinaria";
 
 export const crearCliente = (
   veterinariaNombre: string,
   nombre: string,
   telefono: string
 ) => {
-  const datos = cargarDatosVeterinaria(veterinariaNombre);
+  const datos = cargarDatosVeterinaria(veterinariaNombre, basePath);
 
   const nuevoCliente = {
     id: generarIdUnico(datos.clientes),
@@ -52,7 +28,7 @@ export const crearCliente = (
   }
 
   datos.clientes.push(nuevoCliente);
-  guardarDatosVeterinaria(veterinariaNombre, datos);
+  guardarDatosVeterinaria(veterinariaNombre, datos, basePath);
   console.log("Cliente creado correctamente:", nuevoCliente);
 };
 
@@ -61,7 +37,7 @@ export const modificarCliente = (
   clienteId: string,
   nuevosDatos: Partial<{ nombre: string; telefono: string }>
 ) => {
-  const datos = cargarDatosVeterinaria(veterinariaNombre);
+  const datos = cargarDatosVeterinaria(veterinariaNombre, basePath);
   const cliente = datos.clientes.find((c: any) => c.id === clienteId);
 
   if (!cliente) {
@@ -79,7 +55,7 @@ export const modificarCliente = (
   );
   cliente.visitas = nuevoNumeroVisitas;
   cliente.esVIP = cliente.visitas >= 5;
-  guardarDatosVeterinaria(veterinariaNombre, datos);
+  guardarDatosVeterinaria(veterinariaNombre, datos, basePath);
   console.log("Cliente modificado correctamente:", cliente);
 };
 
@@ -87,7 +63,7 @@ export const eliminarCliente = (
   veterinariaNombre: string,
   clienteId: string
 ) => {
-  const datos = cargarDatosVeterinaria(veterinariaNombre);
+  const datos = cargarDatosVeterinaria(veterinariaNombre, basePath);
   const indice = datos.clientes.findIndex((c: any) => c.id === clienteId);
 
   if (indice === -1) {
@@ -95,12 +71,12 @@ export const eliminarCliente = (
   }
 
   datos.clientes.splice(indice, 1);
-  guardarDatosVeterinaria(veterinariaNombre, datos);
+  guardarDatosVeterinaria(veterinariaNombre, datos, basePath);
   console.log("Cliente eliminado correctamente.");
 };
 
 export const listarClientes = (veterinariaNombre: string) => {
-  const datos = cargarDatosVeterinaria(veterinariaNombre);
+  const datos = cargarDatosVeterinaria(veterinariaNombre, basePath);
 
   if (datos.clientes.length === 0) {
     console.log("No hay clientes registrados en esta veterinaria.");

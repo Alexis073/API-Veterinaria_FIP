@@ -4,8 +4,8 @@ exports.generarIdUnico = void 0;
 const generarIdUnico = (lista) => {
     let nuevoId;
     do {
-        nuevoId = `c_${Math.floor(Math.random() * 10000)}`;
-    } while (lista.some((item) => item.id === nuevoId));
+        nuevoId = Math.random().toString(36).substr(2, 9); // Generar ID único
+    } while (lista.some((item) => item.id === nuevoId)); // Verifica sólo IDs de pacientes
     return nuevoId;
 };
 exports.generarIdUnico = generarIdUnico;

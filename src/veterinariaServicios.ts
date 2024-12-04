@@ -84,3 +84,38 @@ export const eliminarVeterinaria = async (nombre: string) => {
     throw error;
   }
 };
+
+export const listarVeterinarias = () => {
+  fs.readdir(basePath, (err, files) => {
+    if (err) {
+      console.log("Error al leer el directorio:", err);
+      return;
+    }
+
+    if (files.length === 0) {
+      console.log("No hay archivos en el directorio.");
+    } else {
+      console.log("Lista de veterinarias:");
+      files.forEach((file, index) => {
+        const filePath = path.join(basePath, file);
+
+        fs.readFile(filePath, "utf8", (err, data) => {
+          if (err) {
+            console.log(`Error al leer el archivo ${file}:`, err);
+            return;
+          }
+
+          try {
+            const jsonContent = JSON.parse(data);
+
+            console.log(
+              `${index + 1}. ${jsonContent.nombre || "Nombre no disponible"}`
+            );
+          } catch (parseErr) {
+            console.log(`Error al parsear el archivo ${file}:`, parseErr);
+          }
+        });
+      });
+    }
+  });
+};

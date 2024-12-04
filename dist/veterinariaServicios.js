@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.eliminarVeterinaria = exports.modificarVeterinaria = exports.crearVeterinaria = void 0;
+exports.listarVeterinarias = exports.eliminarVeterinaria = exports.modificarVeterinaria = exports.crearVeterinaria = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const generarIdUnico_1 = require("./generarIdUnico");
@@ -80,3 +80,34 @@ const eliminarVeterinaria = (nombre) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.eliminarVeterinaria = eliminarVeterinaria;
+const listarVeterinarias = () => {
+    fs_1.default.readdir(basePath, (err, files) => {
+        if (err) {
+            console.log("Error al leer el directorio:", err);
+            return;
+        }
+        if (files.length === 0) {
+            console.log("No hay archivos en el directorio.");
+        }
+        else {
+            console.log("Lista de veterinarias:");
+            files.forEach((file, index) => {
+                const filePath = path_1.default.join(basePath, file);
+                fs_1.default.readFile(filePath, "utf8", (err, data) => {
+                    if (err) {
+                        console.log(`Error al leer el archivo ${file}:`, err);
+                        return;
+                    }
+                    try {
+                        const jsonContent = JSON.parse(data);
+                        console.log(`${index + 1}. ${jsonContent.nombre || "Nombre no disponible"}`);
+                    }
+                    catch (parseErr) {
+                        console.log(`Error al parsear el archivo ${file}:`, parseErr);
+                    }
+                });
+            });
+        }
+    });
+};
+exports.listarVeterinarias = listarVeterinarias;

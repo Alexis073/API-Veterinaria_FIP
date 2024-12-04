@@ -1,0 +1,65 @@
+{
+  "nombre": "PRB",
+  "clientes": [
+    {
+      "id": "c_9450",
+      "nombre": "Rolando Rosas",
+      "telefono": "9283019288",
+      "esVIP": false,
+      "visitas": 0
+    },
+    {
+      "id": "c_9019",
+      "nombre": "Pepe",
+      "telefono": "9482746198",
+      "esVIP": false,
+      "visitas": 0
+    },
+    {
+      "id": "9rmevlp3t",
+      "nombre": "Nuevo",
+      "telefono": "4829128374",
+      "esVIP": false,
+      "visitas": 0
+    }
+  ],
+  "pacientes": [
+    {
+      "idPaciente": "fobewahn5",
+      "nombre": "Thor",
+      "especie": "exótica",
+      "idDueño": "c_9450"
+    },
+    {
+      "idPaciente": "7wx8tzhur",
+      "nombre": "Rob",
+      "especie": "exótica",
+      "idDueño": "c_9450"
+    },
+    {
+      "idPaciente": "70dzkvudb",
+      "nombre": "Lola",
+      "especie": "exótica",
+      "idDueño": "c_9450"
+    },
+    {
+      "idPaciente": "lip0l4a5a",
+      "nombre": "Pedro",
+      "especie": "exótica",
+      "idDueño": "c_9450"
+    },
+    {
+      "idPaciente": "ucg8ysjfx",
+      "nombre": "Mora",
+      "especie": "exótica",
+      "idDueño": "c_9450"
+    }
+  ],
+  "proveedores": [
+    {
+      "id": "kjp7nlg2l",
+      "nombre": "provedor1",
+      "telefono": "2839401928"
+    }
+  ]
+}
