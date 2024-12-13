@@ -13,10 +13,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const readline_1 = __importDefault(require("readline"));
+const path_1 = __importDefault(require("path"));
+const basePath = path_1.default.join(__dirname, "data");
 const veterinariaServicios_1 = require("./veterinariaServicios");
 const clientesServicios_1 = require("./clientesServicios");
 const proveedoresServicios_ts_1 = require("./proveedoresServicios.ts");
 const Pacientes_1 = require("./Pacientes");
+const datosVeterinaria_1 = require("./datosVeterinaria");
+const datosVeterinaria = new datosVeterinaria_1.DatosVeterinaria();
+const vetServicios = new veterinariaServicios_1.VeterinariaServicios();
+const clienteServicios = new clientesServicios_1.ClienteServicios(datosVeterinaria, basePath);
+const proveedorServicios = new proveedoresServicios_ts_1.ProveedoresServicios(datosVeterinaria, basePath);
+const pacienteServicios = new Pacientes_1.Paciente(datosVeterinaria, basePath);
 const rl = readline_1.default.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -34,13 +42,13 @@ const mostrarMenu = () => {
     rl.question("Seleccione una opción: ", (op) => {
         switch (op) {
             case "1":
-                crearNuevaVeterinaria();
+                vetServicios.crearNuevaVeterinaria(rl, mostrarMenu, manejarError);
                 break;
             case "2":
                 rl.question("Ingrese el nombre de la veterinaria a modificar: ", (nombre) => {
                     try {
                         rl.question("Nuevo nombre (dejar vacío para no cambiar): ", (nuevoNombre) => {
-                            (0, veterinariaServicios_1.modificarVeterinaria)(nombre, {
+                            vetServicios.modificarVeterinaria(nombre, {
                                 nombre: nuevoNombre || undefined,
                             });
                             console.log("Veterinaria modificada correctamente.");
@@ -56,7 +64,7 @@ const mostrarMenu = () => {
             case "3":
                 rl.question("Ingrese el nombre de la veterinaria a eliminar: ", (nombre) => {
                     try {
-                        (0, veterinariaServicios_1.eliminarVeterinaria)(nombre);
+                        vetServicios.eliminarVeterinaria(nombre);
                         console.log("Veterinaria eliminada correctamente.");
                         mostrarMenu();
                     }
@@ -68,7 +76,7 @@ const mostrarMenu = () => {
                 break;
             case "4":
                 try {
-                    (0, veterinariaServicios_1.listarVeterinarias)();
+                    vetServicios.listarVeterinarias();
                 }
                 catch (error) {
                     manejarError(error);
@@ -133,7 +141,7 @@ const mostrarMenuClientes = (veterinariaNombre) => {
                 rl.question("Nombre del cliente: ", (nombre) => {
                     rl.question("Teléfono del cliente: ", (telefono) => {
                         try {
-                            (0, clientesServicios_1.crearCliente)(veterinariaNombre, nombre, telefono);
+                            clienteServicios.crearCliente(veterinariaNombre, nombre, telefono);
                             console.log("Cliente creado correctamente.");
                         }
                         catch (error) {
@@ -148,7 +156,7 @@ const mostrarMenuClientes = (veterinariaNombre) => {
                     rl.question("Nuevo nombre (dejar vacío para no cambiar): ", (nombre) => {
                         rl.question("Nuevo teléfono (dejar vacío para no cambiar): ", (telefono) => {
                             try {
-                                (0, clientesServicios_1.modificarCliente)(veterinariaNombre, id, {
+                                clienteServicios.modificarCliente(veterinariaNombre, id, {
                                     nombre: nombre || undefined,
                                     telefono: telefono || undefined,
                                 });
@@ -165,7 +173,7 @@ const mostrarMenuClientes = (veterinariaNombre) => {
             case "3":
                 rl.question("ID del cliente: ", (id) => {
                     try {
-                        (0, clientesServicios_1.eliminarCliente)(veterinariaNombre, id);
+                        clienteServicios.eliminarCliente(veterinariaNombre, id);
                         console.log("Cliente eliminado correctamente.");
                     }
                     catch (error) {
@@ -176,7 +184,7 @@ const mostrarMenuClientes = (veterinariaNombre) => {
                 break;
             case "4":
                 try {
-                    (0, clientesServicios_1.listarClientes)(veterinariaNombre);
+                    clienteServicios.listarClientes(veterinariaNombre);
                 }
                 catch (error) {
                     manejarError(error);
@@ -189,19 +197,6 @@ const mostrarMenuClientes = (veterinariaNombre) => {
             default:
                 console.log("Opción no valida.");
                 mostrarMenuClientes(veterinariaNombre);
-        }
-    });
-};
-const crearNuevaVeterinaria = () => {
-    rl.question("Ingresar el nombre de la veterinaria: ", (nombre) => {
-        (0, veterinariaServicios_1.crearVeterinaria)(nombre);
-        try {
-            console.log("Veterinaria creada correctamente.");
-            mostrarMenu();
-        }
-        catch (error) {
-            manejarError(error);
-            mostrarMenu();
         }
     });
 };
@@ -226,7 +221,7 @@ const mostrarMenuProveedores = (veterinariaNombre) => {
                 rl.question("Nombre del Proveedor: ", (nombre) => {
                     rl.question("Teléfono del Proveedor: ", (telefono) => {
                         try {
-                            (0, proveedoresServicios_ts_1.crearProveedor)(veterinariaNombre, nombre, telefono);
+                            proveedorServicios.crearProveedor(veterinariaNombre, nombre, telefono);
                             console.log("Proveedor creado correctamente.");
                         }
                         catch (error) {
@@ -241,7 +236,7 @@ const mostrarMenuProveedores = (veterinariaNombre) => {
                     rl.question("Nuevo nombre (dejar vacío para no cambiar): ", (nombre) => {
                         rl.question("Nuevo teléfono (dejar vacío para no cambiar): ", (telefono) => {
                             try {
-                                (0, proveedoresServicios_ts_1.modificarProveedor)(veterinariaNombre, id, {
+                                proveedorServicios.modificarProveedor(veterinariaNombre, id, {
                                     nombre: nombre || undefined,
                                     telefono: telefono || undefined,
                                 });
@@ -258,7 +253,7 @@ const mostrarMenuProveedores = (veterinariaNombre) => {
             case "3":
                 rl.question("ID del Proveedor: ", (id) => {
                     try {
-                        (0, proveedoresServicios_ts_1.eliminarProveedor)(veterinariaNombre, id);
+                        proveedorServicios.eliminarProveedor(veterinariaNombre, id);
                         console.log("Proveedor eliminado correctamente.");
                     }
                     catch (error) {
@@ -269,7 +264,7 @@ const mostrarMenuProveedores = (veterinariaNombre) => {
                 break;
             case "4":
                 try {
-                    (0, proveedoresServicios_ts_1.listarProveedores)(veterinariaNombre);
+                    proveedorServicios.listarProveedores(veterinariaNombre);
                 }
                 catch (error) {
                     manejarError(error);
@@ -290,7 +285,8 @@ const mostrarMenuPacientes = (veterinariaNombre) => {
     console.log("1. Crear paciente");
     console.log("2. Modificar paciente");
     console.log("3. Eliminar paciente");
-    console.log("4. Volver al menú principal");
+    console.log("4. Listar pacientes");
+    console.log("5. Volver al menú principal");
     rl.question("Seleccione una opción: ", (op) => {
         switch (op) {
             case "1":
@@ -298,7 +294,7 @@ const mostrarMenuPacientes = (veterinariaNombre) => {
                     rl.question("Especie del paciente: ", (especie) => {
                         rl.question("ID del dueño: ", (idDueño) => {
                             try {
-                                (0, Pacientes_1.altaPaciente)(veterinariaNombre, nombre, especie, idDueño);
+                                pacienteServicios.crearPaciente(veterinariaNombre, nombre, especie, idDueño);
                                 console.log("Paciente creado correctamente.");
                             }
                             catch (error) {
@@ -311,11 +307,15 @@ const mostrarMenuPacientes = (veterinariaNombre) => {
                 break;
             case "2":
                 rl.question("ID del paciente: ", (idPaciente) => {
-                    rl.question("Nuevo nombre (dejar vacío para no cambiar): ", (nuevoNombre) => {
-                        rl.question("Nueva especie (dejar vacío para no cambiar): ", (nuevaEspecie) => {
-                            rl.question("Nuevo ID del dueño (dejar vacío para no cambiar): ", (nuevoIdDueño) => {
+                    rl.question("Nuevo nombre (dejar vacío para no cambiar): ", (nombre) => {
+                        rl.question("Nueva especie (dejar vacío para no cambiar): ", (especie) => {
+                            rl.question("Nuevo ID del dueño (dejar vacío para no cambiar): ", (IdDuenio) => {
                                 try {
-                                    (0, Pacientes_1.modificarPaciente)(veterinariaNombre, idPaciente, nuevoNombre || undefined, nuevaEspecie || undefined, nuevoIdDueño || undefined);
+                                    pacienteServicios.modificarPaciente(veterinariaNombre, idPaciente, {
+                                        nombre: nombre || undefined,
+                                        especie: especie || undefined,
+                                        IdDuenio: IdDuenio || undefined,
+                                    });
                                     console.log("Paciente modificado correctamente.");
                                 }
                                 catch (error) {
@@ -330,7 +330,7 @@ const mostrarMenuPacientes = (veterinariaNombre) => {
             case "3":
                 rl.question("ID del paciente: ", (idPaciente) => {
                     try {
-                        (0, Pacientes_1.bajaPaciente)(veterinariaNombre, idPaciente);
+                        pacienteServicios.bajaPaciente(veterinariaNombre, idPaciente);
                         console.log("Paciente eliminado correctamente.");
                     }
                     catch (error) {
@@ -340,6 +340,15 @@ const mostrarMenuPacientes = (veterinariaNombre) => {
                 });
                 break;
             case "4":
+                try {
+                    pacienteServicios.listarPacientes(veterinariaNombre);
+                }
+                catch (error) {
+                    manejarError(error);
+                }
+                mostrarMenuPacientes(veterinariaNombre);
+                break;
+            case "5":
                 mostrarMenu();
                 break;
             default:

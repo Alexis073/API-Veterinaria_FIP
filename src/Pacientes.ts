@@ -1,93 +1,67 @@
 import path from "path";
-import {
-  cargarDatosVeterinaria,
-  guardarDatosVeterinaria,
-} from "./datosVeterinaria";
-import { generarIdUnico } from "./generarIdUnico";
 
-interface Paciente {
-  idPaciente: string;
+import { DatosVeterinaria } from "./datosVeterinaria";
+import { BaseServicios } from "./BaseServicios";
+
+interface PacienteData {
+  id: string;
   nombre: string;
   especie: string;
   idDueño: string;
 }
 
-const basePath = path.join(__dirname, "data");
-const pacientes: { [key: string]: Paciente[] } = {};
+export class Paciente extends BaseServicios {
+  datosVeterinaria = new DatosVeterinaria();
+  basePath = path.join(__dirname, "data");
+  pacientes: { [key: string]: PacienteData[] } = {};
 
-export const altaPaciente = async (
-  veterinariaNombre: string,
-  nombre: string,
-  especie: string,
-  idDueño: string
-) => {
-  const datos = await cargarDatosVeterinaria(veterinariaNombre, basePath);
-  if (!datos) {
-    console.error("Veterinaria no encontrada.");
-    return;
+  crearPaciente(
+    veterinariaNombre: string,
+    nombre: string,
+    especie: string,
+    idDuenio: string
+  ) {
+    const especiesPermitidas = ["perro", "gato"];
+    if (!especiesPermitidas.includes(especie.toLowerCase())) {
+      especie = "exotica";
+    }
+    const opciones = {
+      especie,
+      idDuenio,
+    };
+
+    this.crearEntidad(
+      "paciente",
+      veterinariaNombre,
+      nombre,
+      undefined,
+      opciones
+    );
   }
 
-  const idPaciente = generarIdUnico(datos.pacientes);
-
-  const paciente: Paciente = {
-    idPaciente,
-    nombre,
-    especie: ["perro", "gato"].includes(especie) ? especie : "exótica",
-    idDueño,
+  bajaPaciente = (veterinariaNombre: string, idPaciente: string) => {
+    this.eliminarEntidad("paciente", veterinariaNombre, idPaciente);
   };
 
-  datos.pacientes.push(paciente);
-  guardarDatosVeterinaria(veterinariaNombre, datos, basePath);
-};
+  modificarPaciente = async (
+    veterinariaNombre: string,
+    idPaciente: string,
+    nuevosDatos: Partial<{ nombre: string; especie: string; IdDuenio: string }>
+  ) => {
+    const { especie } = nuevosDatos;
+    if (especie && !["perro", "gato"].includes(especie.toLowerCase())) {
+      nuevosDatos.especie = "exotica";
+    }
 
-export const bajaPaciente = async (
-  veterinariaNombre: string,
-  idPaciente: string
-): Promise<void> => {
-  const veterinaria = await cargarDatosVeterinaria(veterinariaNombre, basePath);
-  if (!veterinaria) {
-    console.error("Veterinaria no encontrada.");
-    return;
-  }
+    this.modificarEntidad(
+      "paciente",
+      veterinariaNombre,
+      idPaciente,
+      nuevosDatos
+    );
+  };
 
-  const index = pacientes[veterinariaNombre]?.findIndex(
-    (paciente) => paciente.idPaciente === idPaciente
-  );
-
-  if (index !== undefined && index !== -1) {
-    pacientes[veterinariaNombre].splice(index, 1);
-    console.log(`Paciente con ID ${idPaciente} dado de baja.`);
-  } else {
-    console.error("Paciente no encontrado.");
-  }
-};
-
-export const modificarPaciente = async (
-  veterinariaNombre: string,
-  idPaciente: string,
-  nuevoNombre?: string,
-  nuevaEspecie?: string,
-  nuevoIdDueño?: string
-): Promise<void> => {
-  const veterinaria = await cargarDatosVeterinaria(veterinariaNombre, basePath);
-  if (!veterinaria) {
-    console.error("Veterinaria no encontrada.");
-    return;
-  }
-
-  const paciente = pacientes[veterinariaNombre]?.find(
-    (paciente) => paciente.idPaciente === idPaciente
-  );
-
-  if (paciente) {
-    paciente.nombre = nuevoNombre || paciente.nombre;
-    paciente.especie =
-      nuevaEspecie && ["perro", "gato"].includes(nuevaEspecie)
-        ? nuevaEspecie
-        : paciente.especie;
-    paciente.idDueño = nuevoIdDueño || paciente.idDueño;
-    console.log("Paciente modificado correctamente:", paciente);
-  } else {
-    console.error("Paciente no encontrado.");
-  }
-};
+  listarPacientes = (veterinariaNombre: string) => {
+    this.listarEntidad("paciente", veterinariaNombre);
+  };
+}

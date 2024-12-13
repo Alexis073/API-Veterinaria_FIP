@@ -12,65 +12,40 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.modificarPaciente = exports.bajaPaciente = exports.altaPaciente = void 0;
+exports.Paciente = void 0;
 const path_1 = __importDefault(require("path"));
 const datosVeterinaria_1 = require("./datosVeterinaria");
-const generarIdUnico_1 = require("./generarIdUnico");
-const basePath = path_1.default.join(__dirname, "data");
-const pacientes = {};
-const altaPaciente = (veterinariaNombre, nombre, especie, idDueño) => __awaiter(void 0, void 0, void 0, function* () {
-    const datos = yield (0, datosVeterinaria_1.cargarDatosVeterinaria)(veterinariaNombre, basePath);
-    if (!datos) {
-        console.error("Veterinaria no encontrada.");
-        return;
+const BaseServicios_1 = require("./BaseServicios");
+class Paciente extends BaseServicios_1.BaseServicios {
+    constructor() {
+        super(...arguments);
+        this.datosVeterinaria = new datosVeterinaria_1.DatosVeterinaria();
+        this.basePath = path_1.default.join(__dirname, "data");
+        this.pacientes = {};
+        this.bajaPaciente = (veterinariaNombre, idPaciente) => {
+            this.eliminarEntidad("paciente", veterinariaNombre, idPaciente);
+        };
+        this.modificarPaciente = (veterinariaNombre, idPaciente, nuevosDatos) => __awaiter(this, void 0, void 0, function* () {
+            const { especie } = nuevosDatos;
+            if (especie && !["perro", "gato"].includes(especie.toLowerCase())) {
+                nuevosDatos.especie = "exotica";
+            }
+            this.modificarEntidad("paciente", veterinariaNombre, idPaciente, nuevosDatos);
+        });
+        this.listarPacientes = (veterinariaNombre) => {
+            this.listarEntidad("paciente", veterinariaNombre);
+        };
     }
-    const idPaciente = (0, generarIdUnico_1.generarIdUnico)(datos.pacientes);
-    const paciente = {
-        idPaciente,
-        nombre,
-        especie: ["perro", "gato"].includes(especie) ? especie : "exótica",
-        idDueño,
-    };
-    datos.pacientes.push(paciente);
-    (0, datosVeterinaria_1.guardarDatosVeterinaria)(veterinariaNombre, datos, basePath);
-});
-exports.altaPaciente = altaPaciente;
-const bajaPaciente = (veterinariaNombre, idPaciente) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const veterinaria = yield (0, datosVeterinaria_1.cargarDatosVeterinaria)(veterinariaNombre, basePath);
-    if (!veterinaria) {
-        console.error("Veterinaria no encontrada.");
-        return;
+    crearPaciente(veterinariaNombre, nombre, especie, idDuenio) {
+        const especiesPermitidas = ["perro", "gato"];
+        if (!especiesPermitidas.includes(especie.toLowerCase())) {
+            especie = "exotica";
+        }
+        const opciones = {
+            especie,
+            idDuenio,
+        };
+        this.crearEntidad("paciente", veterinariaNombre, nombre, undefined, opciones);
     }
-    const index = (_a = pacientes[veterinariaNombre]) === null || _a === void 0 ? void 0 : _a.findIndex((paciente) => paciente.idPaciente === idPaciente);
-    if (index !== undefined && index !== -1) {
-        pacientes[veterinariaNombre].splice(index, 1);
-        console.log(`Paciente con ID ${idPaciente} dado de baja.`);
-    }
-    else {
-        console.error("Paciente no encontrado.");
-    }
-});
-exports.bajaPaciente = bajaPaciente;
-const modificarPaciente = (veterinariaNombre, idPaciente, nuevoNombre, nuevaEspecie, nuevoIdDueño) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const veterinaria = yield (0, datosVeterinaria_1.cargarDatosVeterinaria)(veterinariaNombre, basePath);
-    if (!veterinaria) {
-        console.error("Veterinaria no encontrada.");
-        return;
-    }
-    const paciente = (_a = pacientes[veterinariaNombre]) === null || _a === void 0 ? void 0 : _a.find((paciente) => paciente.idPaciente === idPaciente);
-    if (paciente) {
-        paciente.nombre = nuevoNombre || paciente.nombre;
-        paciente.especie =
-            nuevaEspecie && ["perro", "gato"].includes(nuevaEspecie)
-                ? nuevaEspecie
-                : paciente.especie;
-        paciente.idDueño = nuevoIdDueño || paciente.idDueño;
-        console.log("Paciente modificado correctamente:", paciente);
-    }
-    else {
-        console.error("Paciente no encontrado.");
-    }
-});
-exports.modificarPaciente = modificarPaciente;
+}
+exports.Paciente = Paciente;

@@ -1,0 +1,14 @@
+{
+  "nombre": "alonsojeje",
+  "clientes": [
+    {
+      "id": "r9ij2twe3",
+      "nombre": "Roberto",
+      "telefono": "129834",
+      "esVIP": false,
+      "visitas": 0
+    }
+  ],
+  "pacientes": [],
+  "proveedores": []
+}

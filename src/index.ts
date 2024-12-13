@@ -1,23 +1,20 @@
 import readline from "readline";
-import {
-  crearVeterinaria,
-  modificarVeterinaria,
-  eliminarVeterinaria,
-  listarVeterinarias,
-} from "./veterinariaServicios";
-import {
-  crearCliente,
-  modificarCliente,
-  eliminarCliente,
-  listarClientes,
-} from "./clientesServicios";
-import {
-  listarProveedores,
-  crearProveedor,
-  eliminarProveedor,
-  modificarProveedor,
-} from "./proveedoresServicios.ts";
-import { altaPaciente, modificarPaciente, bajaPaciente } from "./Pacientes";
+import path from "path";
+
+const basePath = path.join(__dirname, "data");
+
+import { VeterinariaServicios } from "./veterinariaServicios";
+import { ClienteServicios } from "./clientesServicios";
+import { ProveedoresServicios } from "./proveedoresServicios.ts";
+import { Paciente } from "./Pacientes";
+import { DatosVeterinaria } from "./datosVeterinaria";
+
+const datosVeterinaria = new DatosVeterinaria();
+
+const vetServicios = new VeterinariaServicios();
+const clienteServicios = new ClienteServicios(datosVeterinaria, basePath);
+const proveedorServicios = new ProveedoresServicios(datosVeterinaria, basePath);
+const pacienteServicios = new Paciente(datosVeterinaria, basePath);
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -38,7 +35,7 @@ const mostrarMenu = () => {
   rl.question("Seleccione una opción: ", (op) => {
     switch (op) {
       case "1":
-        crearNuevaVeterinaria();
+        vetServicios.crearNuevaVeterinaria(rl, mostrarMenu, manejarError);
         break;
       case "2":
         rl.question(
@@ -48,7 +45,7 @@ const mostrarMenu = () => {
               rl.question(
                 "Nuevo nombre (dejar vacío para no cambiar): ",
                 (nuevoNombre) => {
-                  modificarVeterinaria(nombre, {
+                  vetServicios.modificarVeterinaria(nombre, {
                     nombre: nuevoNombre || undefined,
                   });
                   console.log("Veterinaria modificada correctamente.");
@@ -67,7 +64,7 @@ const mostrarMenu = () => {
           "Ingrese el nombre de la veterinaria a eliminar: ",
           (nombre) => {
             try {
-              eliminarVeterinaria(nombre);
+              vetServicios.eliminarVeterinaria(nombre);
               console.log("Veterinaria eliminada correctamente.");
               mostrarMenu();
             } catch (err) {
@@ -79,7 +76,7 @@ const mostrarMenu = () => {
         break;
       case "4":
         try {
-          listarVeterinarias();
+          vetServicios.listarVeterinarias();
         } catch (error) {
           manejarError(error);
         }
@@ -151,7 +148,11 @@ const mostrarMenuClientes = (veterinariaNombre: string) => {
         rl.question("Nombre del cliente: ", (nombre) => {
           rl.question("Teléfono del cliente: ", (telefono) => {
             try {
-              crearCliente(veterinariaNombre, nombre, telefono);
+              clienteServicios.crearCliente(
+                veterinariaNombre,
+                nombre,
+                telefono
+              );
               console.log("Cliente creado correctamente.");
             } catch (error) {
               manejarError(error);
@@ -169,7 +170,7 @@ const mostrarMenuClientes = (veterinariaNombre: string) => {
                 "Nuevo teléfono (dejar vacío para no cambiar): ",
                 (telefono) => {
                   try {
-                    modificarCliente(veterinariaNombre, id, {
+                    clienteServicios.modificarCliente(veterinariaNombre, id, {
                       nombre: nombre || undefined,
                       telefono: telefono || undefined,
                     });
@@ -187,7 +188,7 @@ const mostrarMenuClientes = (veterinariaNombre: string) => {
       case "3":
         rl.question("ID del cliente: ", (id) => {
           try {
-            eliminarCliente(veterinariaNombre, id);
+            clienteServicios.eliminarCliente(veterinariaNombre, id);
             console.log("Cliente eliminado correctamente.");
           } catch (error) {
             manejarError(error);
@@ -197,7 +198,7 @@ const mostrarMenuClientes = (veterinariaNombre: string) => {
         break;
       case "4":
         try {
-          listarClientes(veterinariaNombre);
+          clienteServicios.listarClientes(veterinariaNombre);
         } catch (error) {
           manejarError(error);
         }
@@ -209,19 +210,6 @@ const mostrarMenuClientes = (veterinariaNombre: string) => {
       default:
         console.log("Opción no valida.");
         mostrarMenuClientes(veterinariaNombre);
-    }
-  });
-};
-
-const crearNuevaVeterinaria = () => {
-  rl.question("Ingresar el nombre de la veterinaria: ", (nombre) => {
-    crearVeterinaria(nombre);
-    try {
-      console.log("Veterinaria creada correctamente.");
-      mostrarMenu();
-    } catch (error) {
-      manejarError(error);
-      mostrarMenu();
     }
   });
 };
@@ -248,7 +236,11 @@ const mostrarMenuProveedores = (veterinariaNombre: string) => {
         rl.question("Nombre del Proveedor: ", (nombre) => {
           rl.question("Teléfono del Proveedor: ", (telefono) => {
             try {
-              crearProveedor(veterinariaNombre, nombre, telefono);
+              proveedorServicios.crearProveedor(
+                veterinariaNombre,
+                nombre,
+                telefono
+              );
               console.log("Proveedor creado correctamente.");
             } catch (error) {
               manejarError(error);
@@ -266,10 +258,14 @@ const mostrarMenuProveedores = (veterinariaNombre: string) => {
                 "Nuevo teléfono (dejar vacío para no cambiar): ",
                 (telefono) => {
                   try {
-                    modificarProveedor(veterinariaNombre, id, {
-                      nombre: nombre || undefined,
-                      telefono: telefono || undefined,
-                    });
+                    proveedorServicios.modificarProveedor(
+                      veterinariaNombre,
+                      id,
+                      {
+                        nombre: nombre || undefined,
+                        telefono: telefono || undefined,
+                      }
+                    );
                     console.log("Proveedor modificado correctamente.");
                   } catch (error) {
                     manejarError(error);
@@ -284,7 +280,7 @@ const mostrarMenuProveedores = (veterinariaNombre: string) => {
       case "3":
         rl.question("ID del Proveedor: ", (id) => {
           try {
-            eliminarProveedor(veterinariaNombre, id);
+            proveedorServicios.eliminarProveedor(veterinariaNombre, id);
             console.log("Proveedor eliminado correctamente.");
           } catch (error) {
             manejarError(error);
@@ -294,7 +290,7 @@ const mostrarMenuProveedores = (veterinariaNombre: string) => {
         break;
       case "4":
         try {
-          listarProveedores(veterinariaNombre);
+          proveedorServicios.listarProveedores(veterinariaNombre);
         } catch (error) {
           manejarError(error);
         }
@@ -315,7 +311,8 @@ const mostrarMenuPacientes = (veterinariaNombre: string) => {
   console.log("1. Crear paciente");
   console.log("2. Modificar paciente");
   console.log("3. Eliminar paciente");
-  console.log("4. Volver al menú principal");
+  console.log("4. Listar pacientes");
+  console.log("5. Volver al menú principal");
 
   rl.question("Seleccione una opción: ", (op) => {
     switch (op) {
@@ -324,7 +321,12 @@ const mostrarMenuPacientes = (veterinariaNombre: string) => {
           rl.question("Especie del paciente: ", (especie) => {
             rl.question("ID del dueño: ", (idDueño) => {
               try {
-                altaPaciente(veterinariaNombre, nombre, especie, idDueño);
+                pacienteServicios.crearPaciente(
+                  veterinariaNombre,
+                  nombre,
+                  especie,
+                  idDueño
+                );
                 console.log("Paciente creado correctamente.");
               } catch (error) {
                 manejarError(error);
@@ -338,20 +340,22 @@ const mostrarMenuPacientes = (veterinariaNombre: string) => {
         rl.question("ID del paciente: ", (idPaciente) => {
           rl.question(
             "Nuevo nombre (dejar vacío para no cambiar): ",
-            (nuevoNombre) => {
+            (nombre) => {
               rl.question(
                 "Nueva especie (dejar vacío para no cambiar): ",
-                (nuevaEspecie) => {
+                (especie) => {
                   rl.question(
                     "Nuevo ID del dueño (dejar vacío para no cambiar): ",
-                    (nuevoIdDueño) => {
+                    (IdDuenio) => {
                       try {
-                        modificarPaciente(
+                        pacienteServicios.modificarPaciente(
                           veterinariaNombre,
                           idPaciente,
-                          nuevoNombre || undefined,
-                          nuevaEspecie || undefined,
-                          nuevoIdDueño || undefined
+                          {
+                            nombre: nombre || undefined,
+                            especie: especie || undefined,
+                            IdDuenio: IdDuenio || undefined,
+                          }
                         );
                         console.log("Paciente modificado correctamente.");
                       } catch (error) {
@@ -369,7 +373,7 @@ const mostrarMenuPacientes = (veterinariaNombre: string) => {
       case "3":
         rl.question("ID del paciente: ", (idPaciente) => {
           try {
-            bajaPaciente(veterinariaNombre, idPaciente);
+            pacienteServicios.bajaPaciente(veterinariaNombre, idPaciente);
             console.log("Paciente eliminado correctamente.");
           } catch (error) {
             manejarError(error);
@@ -378,6 +382,14 @@ const mostrarMenuPacientes = (veterinariaNombre: string) => {
         });
         break;
       case "4":
+        try {
+          pacienteServicios.listarPacientes(veterinariaNombre);
+        } catch (error) {
+          manejarError(error);
+        }
+        mostrarMenuPacientes(veterinariaNombre);
+        break;
+      case "5":
         mostrarMenu();
         break;
       default:

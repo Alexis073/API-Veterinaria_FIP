@@ -1,0 +1,14 @@
+{
+  "nombre": "prueba82",
+  "clientes": [
+    {
+      "id": "m99f1tu47",
+      "nombre": "Lola",
+      "telefono": "12312",
+      "esVIP": false,
+      "visitas": 0
+    }
+  ],
+  "pacientes": [],
+  "proveedores": []
+}

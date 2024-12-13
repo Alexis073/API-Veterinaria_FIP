@@ -1,0 +1,58 @@
+{
+  "nombre": "prb2",
+  "clientes": [
+    {
+      "id": "huqltl693",
+      "nombre": "Roberto",
+      "telefono": "09",
+      "esVIP": false,
+      "visitas": 0
+    },
+    {
+      "id": "oqugw0aec",
+      "nombre": "Rolando",
+      "telefono": "9290",
+      "esVIP": false,
+      "visitas": 0
+    }
+  ],
+  "pacientes": [
+    {
+      "id": "qmsu02v6j",
+      "nombre": "Kira",
+      "especie": "Perro",
+      "idDuenio": "w2r6utt4n"
+    },
+    {
+      "id": "6k9x77udk",
+      "nombre": "Zamba",
+      "especie": "Perro",
+      "idDuenio": "qxla06pd0"
+    },
+    {
+      "id": "v67achuvm",
+      "nombre": "Lola",
+      "especie": "exotica",
+      "idDuenio": "huqltl693"
+    },
+    {
+      "id": "p6jp04lhi",
+      "nombre": "Lole",
+      "especie": "exotica",
+      "idDuenio": "huqltl693"
+    },
+    {
+      "id": "enbmyzmou",
+      "nombre": "Rolly",
+      "especie": "exotica",
+      "idDuenio": "huqltl693"
+    }
+  ],
+  "proveedores": [
+    {
+      "id": "jt4cyrhhp",
+      "nombre": "Pepe Argento",
+      "telefono": "01293"
+    }
+  ]
+}
